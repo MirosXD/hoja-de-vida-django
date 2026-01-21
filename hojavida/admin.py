@@ -9,7 +9,7 @@ from .models import (
     VentaGarage,
 )
 
-
+# --- CONFIGURACIÓN DE DATOS PERSONALES ---
 @admin.register(DatosPersonales)
 class DatosPersonalesAdmin(admin.ModelAdmin):
     list_display = (
@@ -22,11 +22,11 @@ class DatosPersonalesAdmin(admin.ModelAdmin):
     search_fields = ("apellidos", "nombres", "numerocedula")
     list_filter = ("perfilactivo",)
 
-
+# --- CONFIGURACIÓN DE EXPERIENCIA LABORAL ---
 @admin.register(ExperienciaLaboral)
 class ExperienciaLaboralAdmin(admin.ModelAdmin):
     list_display = (
-        "idexperiencialaboral",  # ✅ NOMBRE CORRECTO
+        "idexperiencialaboral",
         "perfil",
         "cargodesempenado",
         "nombrempresa",
@@ -35,7 +35,7 @@ class ExperienciaLaboralAdmin(admin.ModelAdmin):
     list_filter = ("activarparaqueseveaenfront",)
     search_fields = ("cargodesempenado", "nombrempresa")
 
-
+# --- CONFIGURACIÓN DE RECONOCIMIENTOS ---
 @admin.register(Reconocimiento)
 class ReconocimientoAdmin(admin.ModelAdmin):
     list_display = (
@@ -47,7 +47,7 @@ class ReconocimientoAdmin(admin.ModelAdmin):
     )
     list_filter = ("tiporeconocimiento", "activarparaqueseveaenfront")
 
-
+# --- CONFIGURACIÓN DE CURSOS ---
 @admin.register(CursoRealizado)
 class CursoRealizadoAdmin(admin.ModelAdmin):
     list_display = (
@@ -59,7 +59,7 @@ class CursoRealizadoAdmin(admin.ModelAdmin):
     )
     list_filter = ("activarparaqueseveaenfront",)
 
-
+# --- CONFIGURACIÓN DE PRODUCTOS ACADÉMICOS ---
 @admin.register(ProductoAcademico)
 class ProductoAcademicoAdmin(admin.ModelAdmin):
     list_display = (
@@ -69,7 +69,7 @@ class ProductoAcademicoAdmin(admin.ModelAdmin):
         "activarparaqueseveaenfront",
     )
 
-
+# --- CONFIGURACIÓN DE PRODUCTOS LABORALES ---
 @admin.register(ProductoLaboral)
 class ProductoLaboralAdmin(admin.ModelAdmin):
     list_display = (
@@ -79,7 +79,7 @@ class ProductoLaboralAdmin(admin.ModelAdmin):
         "activarparaqueseveaenfront",
     )
 
-
+# --- CONFIGURACIÓN DE VENTA DE GARAGE ---
 @admin.register(VentaGarage)
 class VentaGarageAdmin(admin.ModelAdmin):
     list_display = (
@@ -90,4 +90,4 @@ class VentaGarageAdmin(admin.ModelAdmin):
         "valordelbien",
         "activarparaqueseveaenfront",
     )
-    list_filter = ("estadoproducto",)
+    list_filter = ("estadoproducto", "activarparaqueseveaenfront")
