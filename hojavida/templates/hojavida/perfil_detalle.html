@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ perfil.apellidos }} {{ perfil.nombres }}</title>
+  <style>
+    :root{
+      /* Colores Verde Bosque Sombrío */
+      --bg:#050a08;
+      --text:#e9fbf3;
+      --muted:#7d8a85;
+      --line:rgba(255,255,255,.08);
+      --accent:#10b981;  /* Esmeralda */
+      --accent2:#064e3b; /* Verde Bosque Profundo */
+      --shadow: 0 10px 30px rgba(0,0,0,.45);
+      --radius:16px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 15% 10%, rgba(16,185,129,.15), transparent 60%),
+        radial-gradient(900px 600px at 85% 20%, rgba(6,78,59,.20), transparent 60%),
+        linear-gradient(180deg, var(--bg), #030706 70%);
+      min-height:100vh;
+    }
+
+    a{color:var(--accent); text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    .container{max-width:1100px; margin:0 auto; padding:28px 18px 48px;}
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:14px; margin-bottom:18px;
+    }
+    .back{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 12px; border:1px solid var(--line); border-radius:999px;
+      background:rgba(255,255,255,.04);
+    }
+
+    .header{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:14px;
+      align-items:stretch;
+      margin-bottom:14px;
+    }
+
+    .hero{
+      padding:18px 18px 16px;
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      box-shadow: var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .hero:before{
+      content:"";
+      position:absolute; inset:-2px;
+      background: radial-gradient(500px 220px at 20% 0%, rgba(16,185,129,.18), transparent 60%);
+      pointer-events:none;
+    }
+
+    .hero-head{
+      position:relative;
+      display:flex;
+      gap:24px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    /* SOLUCIÓN FOTO: Contenedor y tamaño */
+    .foto-perfil {
+      flex-shrink: 0;
+    }
+    .foto-perfil img{
+      width:140px;
+      height:140px;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+      /* Borde esmeralda para resaltar en el fondo oscuro */
+      border: 3px solid var(--accent);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      background: #0d1411;
+    }
+
+    .name{
+      margin:0;
+      font-size:34px;
+      line-height:1.15;
+    }
+    .subtitle{
+      margin:8px 0 0;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;}
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:7px 10px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background:rgba(255,255,255,.04);
+      font-size:13px;
+    }
+    .dot{
+      width:8px; height:8px; border-radius:50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+    }
+
+    .aside{
+      padding:18px;
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      background:rgba(255,255,255,.03);
+      box-shadow: var(--shadow);
+    }
+    .aside h3{margin:0 0 10px; font-size:16px; color:var(--accent);}
+    .kv{display:grid; grid-template-columns:130px 1fr; gap:10px; font-size:14px;}
+    .k{color:var(--muted)}
+    .v{color:var(--text)}
+    .kv .row{display:contents}
+
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      margin-top:14px;
+    }
+
+    .card{
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      box-shadow: var(--shadow);
+      padding:16px;
+    }
+    .card h2{
+      margin:0 0 12px;
+      font-size:18px;
+      display:flex; justify-content:space-between;
+      color: var(--accent);
+    }
+    .hint{color:var(--muted); font-size:13px}
+
+    .timeline{
+      border-left:1px solid var(--line);
+      padding-left:14px;
+    }
+    .item{
+      position:relative;
+      padding:10px 0;
+    }
+    .item:before{
+      content:"";
+      position:absolute;
+      left:-21px; top:16px;
+      width:12px; height:12px;
+      border-radius:50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow:0 0 0 4px rgba(16,185,129,.12);
+    }
+    .title{font-weight:700; margin:0; font-size:15px;}
+    .meta{margin:4px 0 0; font-size:13px; color:var(--muted);}
+    .desc{margin:8px 0 0; font-size:14px;}
+
+    .empty{
+      padding:12px;
+      border:1px dashed var(--line);
+      border-radius:12px;
+      color:var(--muted);
+      background:rgba(255,255,255,.02);
+      font-size:14px;
+    }
+
+    @media (max-width:950px){
+      .header{grid-template-columns:1fr;}
+      .grid{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <a class="back" href="{% url 'hojavida:home' %}">← Volver</a>
+    <div class="hint">Hoja de vida</div>
+  </div>
+
+  <div class="header">
+    <div class="hero">
+      <div class="hero-head">
+        <div class="foto-perfil">
+          {% if perfil.foto %}
+            <img src="{{ perfil.foto.url }}" alt="Foto de {{ perfil.nombres }}">
+          {% else %}
+            <img src="https://ui-avatars.com/api/?name={{ perfil.nombres }}+{{ perfil.apellidos }}&background=0d1411&color=10b981&size=140" alt="Sin foto">
+          {% endif %}
+        </div>
+
+        <div>
+          <h1 class="name">{{ perfil.apellidos }} {{ perfil.nombres }}</h1>
+          <p class="subtitle">{{ perfil.descripcionperfil|default:"Perfil profesional" }}</p>
+
+          <div class="chips">
+            {% if perfil.nacionalidad %}<span class="chip"><span class="dot"></span>{{ perfil.nacionalidad }}</span>{% endif %}
+            {% if perfil.numerocedula %}<span class="chip"><span class="dot"></span>CI: {{ perfil.numerocedula }}</span>{% endif %}
+            {% if perfil.get_sexo_display %}<span class="chip"><span class="dot"></span>{{ perfil.get_sexo_display }}</span>{% endif %}
+            {% if perfil.estadocivil %}<span class="chip"><span class="dot"></span>{{ perfil.estadocivil }}</span>{% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="aside">
+      <h3>Contacto y ubicación</h3>
+      <div class="kv">
+        <div class="row"><div class="k">Teléfono</div><div class="v">{{ perfil.telefonoconvencional|default_if_none:"" }}</div></div>
+        <div class="row"><div class="k">Dir. domicilio</div><div class="v">{{ perfil.direcciondomiciliaria|default_if_none:"" }}</div></div>
+        <div class="row"><div class="k">Dir. trabajo</div><div class="v">{{ perfil.direcciontrabajo|default_if_none:"" }}</div></div>
+        <div class="row"><div class="k">Lugar nac.</div><div class="v">{{ perfil.lugarnacimiento|default_if_none:"" }}</div></div>
+        <div class="row"><div class="k">Fecha nac.</div><div class="v">{{ perfil.fechanacimiento|default_if_none:"" }}</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid">
+
+    <div class="card">
+      <h2>Experiencia laboral <span class="hint">Últimos trabajos</span></h2>
+      {% if experiencias %}
+        <div class="timeline">
+          {% for e in experiencias %}
+            <div class="item">
+              <p class="title">{{ e.cargodesempenado }}{% if e.nombrempresa %} — {{ e.nombrempresa }}{% endif %}</p>
+              <p class="meta">{{ e.fechainiciogestion }} → {{ e.fechafingestion }}</p>
+              {% if e.descripcionfunciones %}<p class="desc">{{ e.descripcionfunciones }}</p>{% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty">Sin registros.</div>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h2>Cursos realizados <span class="hint">Formación</span></h2>
+      {% if cursos %}
+        <div class="timeline">
+          {% for c in cursos %}
+            <div class="item">
+              <p class="title">{{ c.nombrecurso }}</p>
+              <p class="meta">{{ c.fechainicio }} → {{ c.fechafin }} · {{ c.totalhoras }} horas</p>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty">Sin registros.</div>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h2>Reconocimientos <span class="hint">Logros</span></h2>
+
+      {% if reconocimientos %}
+        <div class="timeline">
+          {% for r in reconocimientos %}
+            <div class="item">
+              <p class="title">
+                {{ r.get_tiporeconocimiento_display }}
+                {% if r.fechareconocimiento %} — {{ r.fechareconocimiento }}{% endif %}
+              </p>
+
+              {% if r.descripcionreconocimiento %}
+                <p class="desc">{{ r.descripcionreconocimiento }}</p>
+              {% endif %}
+
+              {% if r.institucioncertificado %}
+                <p class="meta">Institución del certificado: {{ r.institucioncertificado }}</p>
+              {% endif %}
+
+              {% if r.fotocertificado %}
+                <p class="meta">Certificado:</p>
+                <a href="{{ r.fotocertificado.url }}" target="_blank" rel="noopener">
+                  <img src="{{ r.fotocertificado.url }}" alt="Certificado" style="max-width:100%; border-radius:12px; border:1px solid var(--line); margin-top:6px;">
+                </a>
+
+                <div style="margin-top:10px;">
+                  <a class="back" href="{{ r.fotocertificado.url }}" target="_blank" rel="noopener">Ver en grande</a>
+                  <a class="back" href="{{ r.fotocertificado.url }}" download style="margin-left:8px;">Descargar</a>
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty">Sin registros.</div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

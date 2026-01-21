@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Directorio de Talento | Deep Forest</title>
+  <style>
+    :root {
+      /* Paleta Verde Bosque y Esmeralda */
+      --primary: #10b981;    /* Esmeralda */
+      --secondary: #064e3b;  /* Verde Bosque Profundo */
+      --bg-dark: #050a08;    /* Negro Bosque */
+      --card-bg: rgba(255, 255, 255, 0.03);
+      --glass-border: rgba(16, 185, 129, 0.15);
+      --text-main: #ffffff;
+      --text-dim: #7d8a85;   /* Gris Verdoso */
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(6, 78, 59, 0.15) 0px, transparent 50%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .container { width: 100%; max-width: 1000px; text-align: center; }
+
+    header { margin-bottom: 50px; }
+    header h1 { 
+        font-size: 3rem; 
+        margin: 0; 
+        background: linear-gradient(to right, #fff, var(--primary)); 
+        -webkit-background-clip: text; 
+        -webkit-text-fill-color: transparent; 
+    }
+    header p { color: var(--text-dim); font-size: 1.2rem; margin-top: 10px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 25px;
+    }
+
+    /* Estilo de la Tarjeta */
+    .profile-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 30px;
+      transition: all 0.3s ease;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .profile-card:hover {
+      transform: translateY(-10px);
+      border-color: var(--primary);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      background: rgba(16, 185, 129, 0.05);
+    }
+
+    .card-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+
+    .avatar-wrapper {
+      position: relative;
+      padding: 3px;
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      border-radius: 50%;
+      width: 86px;
+      height: 86px;
+      flex-shrink: 0;
+    }
+
+    .avatar {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #0d1411;
+      border: 3px solid #0d1411;
+      display: block;
+    }
+
+    .name-info h2 { font-size: 1.25rem; margin: 0; letter-spacing: -0.5px; color: #fff; }
+    .name-info span { color: var(--text-dim); font-size: 0.85rem; }
+
+    .bio {
+      color: var(--text-dim);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin-bottom: 20px;
+      height: 45px;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    .skills-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--primary); margin-bottom: 10px; font-weight: bold; }
+
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 25px; flex-grow: 1; }
+    .tag {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      border: 1px solid var(--glass-border);
+      color: var(--text-dim);
+    }
+
+    .btn-expediente {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      text-align: center;
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      color: white;
+      text-decoration: none;
+      border-radius: 14px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .btn-expediente:hover { 
+        filter: brightness(1.1);
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      padding: 60px;
+      border: 2px dashed var(--glass-border);
+      border-radius: 24px;
+      color: var(--text-dim);
+    }
+
+    @media (max-width: 600px) {
+      header h1 { font-size: 2.2rem; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Directorio de Talento</h1>
+      <p>Conoce a los especialistas de nuestro equipo.</p>
+    </header>
+
+    <div class="grid">
+      {% if perfiles %}
+        {% for p in perfiles %}
+          <div class="profile-card">
+            <div class="card-header">
+              <div class="avatar-wrapper">
+                <img class="avatar" 
+                     src="{{ p.foto_safe_url }}" 
+                     alt="{{ p.nombres }}"
+                     loading="lazy">
+              </div>
+              <div class="name-info">
+                <h2>{{ p.nombres }} {{ p.apellidos }}</h2>
+                <span>CI: {{ p.numerocedula|default:"No registrada" }}</span>
+              </div>
+            </div>
+
+            <div class="skills-title">Sobre mí</div>
+            <div class="bio">
+              {{ p.descripcionperfil|default:"Profesional enfocado en resultados y desarrollo continuo dentro de la organización." }}
+            </div>
+
+            <div class="skills-title">Información</div>
+            <div class="tags">
+              <span class="tag">📍 {{ p.nacionalidad|default:"Global" }}</span>
+              <span class="tag">👤 {{ p.get_sexo_display|default:"No definido" }}</span>
+              {% if p.perfilactivo %}
+                <span class="tag" style="border-color: var(--primary); color: var(--primary);">✓ Activo</span>
+              {% endif %}
+            </div>
+
+            <a href="{% url 'hojavida:perfil_detalle' p.idperfil %}" class="btn-expediente">
+              Ver Expediente Completo
+            </a>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <p>No hay perfiles de talentos registrados en este momento.</p>
+          <a href="/admin" style="color: var(--primary); text-decoration: none;">Ir al panel de administración</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <footer style="margin-top: 50px;">
+        <a href="/admin" style="color: var(--text-dim); text-decoration: none; font-size: 0.85rem; padding: 10px 20px; border: 1px solid var(--glass-border); border-radius: 30px; transition: 0.3s;">
+            Panel Administrativo
+        </a>
+    </footer>
+  </div>
+
+</body>
+</html>
