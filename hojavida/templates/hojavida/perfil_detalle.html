@@ -6,13 +6,13 @@
   <title>{{ perfil.apellidos }} {{ perfil.nombres }}</title>
   <style>
     :root{
-      /* Colores Verde Bosque Sombrío */
       --bg:#050a08;
       --text:#e9fbf3;
       --muted:#7d8a85;
       --line:rgba(255,255,255,.08);
       --accent:#10b981;  /* Esmeralda */
       --accent2:#064e3b; /* Verde Bosque Profundo */
+      --accent-pdf: #ef4444; /* Rojo para PDF */
       --shadow: 0 10px 30px rgba(0,0,0,.45);
       --radius:16px;
     }
@@ -33,88 +33,102 @@
     a:hover{text-decoration:underline}
 
     .container{max-width:1100px; margin:0 auto; padding:28px 18px 48px;}
+    
     .topbar{
       display:flex; align-items:center; justify-content:space-between;
       gap:14px; margin-bottom:18px;
     }
+    
+    .topbar-actions {
+      display: flex;
+      gap: 10px;
+    }
+
     .back{
       display:inline-flex; align-items:center; gap:8px;
-      padding:10px 12px; border:1px solid var(--line); border-radius:999px;
+      padding:10px 14px; border:1px solid var(--line); border-radius:999px;
       background:rgba(255,255,255,.04);
+      font-size: 14px;
+      transition: 0.3s;
+    }
+    .back:hover { background:rgba(255,255,255,.1); }
+
+    /* Botón Venta de Garage */
+    .btn-garage {
+      background: rgba(16, 185, 129, 0.15) !important;
+      border-color: rgba(16, 185, 129, 0.4) !important;
+      color: var(--accent) !important;
+      font-weight: 600;
+      width: 100%;
+      justify-content: center;
+      margin-top: 15px;
+    }
+    .btn-garage:hover {
+      background: var(--accent) !important;
+      color: white !important;
+    }
+
+    .btn-pdf-main {
+      background: rgba(239, 68, 68, 0.15) !important;
+      border-color: rgba(239, 68, 68, 0.4) !important;
+      color: #ff7e7e !important;
+      font-weight: 600;
+    }
+    .btn-pdf-main:hover {
+      background: rgba(239, 68, 68, 0.25) !important;
+      border-color: var(--accent-pdf) !important;
     }
 
     .header{
       display:grid;
-      grid-template-columns: 1.2fr .8fr;
+      grid-template-columns: 1.3fr .7fr;
       gap:14px;
       align-items:stretch;
       margin-bottom:14px;
     }
 
     .hero{
-      padding:18px 18px 16px;
+      padding:25px;
       border:1px solid var(--line);
       border-radius: var(--radius);
       background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
       box-shadow: var(--shadow);
-      position:relative;
-      overflow:hidden;
-    }
-    .hero:before{
-      content:"";
-      position:absolute; inset:-2px;
-      background: radial-gradient(500px 220px at 20% 0%, rgba(16,185,129,.18), transparent 60%);
-      pointer-events:none;
     }
 
-    .hero-head{
-      position:relative;
-      display:flex;
-      gap:24px;
-      align-items:center;
-      flex-wrap:wrap;
+    /* CONTENEDOR FLEX PARA FOTO + INFO */
+    .hero-content {
+      display: flex;
+      gap: 25px;
+      align-items: flex-start;
     }
 
-    /* SOLUCIÓN FOTO: Contenedor y tamaño */
-    .foto-perfil {
-      flex-shrink: 0;
-    }
     .foto-perfil img{
-      width:140px;
-      height:140px;
-      border-radius: 50%;
+      width:150px; height:150px;
+      border-radius: var(--radius);
       object-fit: cover;
       display: block;
-      /* Borde esmeralda para resaltar en el fondo oscuro */
-      border: 3px solid var(--accent);
+      border: 2px solid var(--accent);
       box-shadow: 0 10px 25px rgba(0,0,0,0.5);
       background: #0d1411;
     }
 
-    .name{
-      margin:0;
-      font-size:34px;
-      line-height:1.15;
-    }
-    .subtitle{
-      margin:8px 0 0;
-      color:var(--muted);
-      font-size:14px;
+    .info-principal { flex: 1; }
+    .name{ margin:0; font-size:32px; line-height:1.1; letter-spacing: -1px; }
+    .subtitle{ margin:8px 0 15px; color:var(--muted); font-size:15px; line-height: 1.4; }
+
+    /* GRID DE DATOS PERSONALES A LA DERECHA */
+    .personal-data {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid var(--line);
     }
 
-    .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;}
-    .chip{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:7px 10px;
-      border:1px solid var(--line);
-      border-radius:999px;
-      background:rgba(255,255,255,.04);
-      font-size:13px;
-    }
-    .dot{
-      width:8px; height:8px; border-radius:50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-    }
+    .data-item { font-size: 13px; }
+    .data-item .k { color: var(--muted); display: block; margin-bottom: 2px; font-size: 11px; text-transform: uppercase; }
+    .data-item .v { color: var(--text); font-weight: 500; }
 
     .aside{
       padding:18px;
@@ -122,14 +136,16 @@
       border-radius: var(--radius);
       background:rgba(255,255,255,.03);
       box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
     }
-    .aside h3{margin:0 0 10px; font-size:16px; color:var(--accent);}
-    .kv{display:grid; grid-template-columns:130px 1fr; gap:10px; font-size:14px;}
-    .k{color:var(--muted)}
-    .v{color:var(--text)}
-    .kv .row{display:contents}
-
-    .grid{
+    .aside h3{margin:0 0 15px; font-size:16px; color:var(--accent); border-bottom: 1px solid var(--line); padding-bottom: 8px;}
+    
+    .contact-kv { display: flex; flex-direction: column; gap: 12px; margin-bottom: auto; }
+    .contact-kv .k { color: var(--muted); font-size: 12px; }
+    .contact-kv .v { font-size: 14px; margin-bottom: 5px; }
+    
+    .grid-cards{
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:14px;
@@ -143,47 +159,41 @@
       box-shadow: var(--shadow);
       padding:16px;
     }
-    .card h2{
-      margin:0 0 12px;
-      font-size:18px;
-      display:flex; justify-content:space-between;
-      color: var(--accent);
-    }
+    .card h2{ margin:0 0 12px; font-size:18px; display:flex; justify-content:space-between; color: var(--accent); }
     .hint{color:var(--muted); font-size:13px}
 
-    .timeline{
-      border-left:1px solid var(--line);
-      padding-left:14px;
-    }
-    .item{
-      position:relative;
-      padding:10px 0;
-    }
+    .timeline{ border-left:1px solid var(--line); padding-left:14px; }
+    .item{ position:relative; padding:10px 0; }
     .item:before{
-      content:"";
-      position:absolute;
-      left:-21px; top:16px;
-      width:12px; height:12px;
-      border-radius:50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      box-shadow:0 0 0 4px rgba(16,185,129,.12);
+      content:""; position:absolute; left:-21px; top:16px;
+      width:12px; height:12px; border-radius:50%;
+      background: var(--accent);
     }
     .title{font-weight:700; margin:0; font-size:15px;}
     .meta{margin:4px 0 0; font-size:13px; color:var(--muted);}
-    .desc{margin:8px 0 0; font-size:14px;}
 
-    .empty{
-      padding:12px;
-      border:1px dashed var(--line);
-      border-radius:12px;
-      color:var(--muted);
-      background:rgba(255,255,255,.02);
-      font-size:14px;
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+      margin-top: 10px;
     }
+    .product-item {
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .product-item img { width: 100%; height: 100px; object-fit: cover; }
+    .product-info { padding: 8px; font-size: 12px; }
+
+    .empty{ padding:12px; border:1px dashed var(--line); border-radius:12px; color:var(--muted); font-size:14px; }
 
     @media (max-width:950px){
       .header{grid-template-columns:1fr;}
-      .grid{grid-template-columns:1fr;}
+      .hero-content { flex-direction: column; align-items: center; text-align: center; }
+      .personal-data { grid-template-columns: 1fr; }
+      .grid-cards{grid-template-columns:1fr;}
     }
   </style>
 </head>
@@ -191,119 +201,154 @@
 <div class="container">
 
   <div class="topbar">
-    <a class="back" href="{% url 'hojavida:home' %}">← Volver</a>
-    <div class="hint">Hoja de vida</div>
+    <a class="back" href="{% url 'hojavida:home' %}">← Volver al inicio</a>
+    <div class="topbar-actions">
+        <a class="back btn-pdf-main" href="{% url 'hojavida:generar_pdf_cv' perfil.idperfil %}">
+            📄 Descargar PDF
+        </a>
+    </div>
   </div>
 
   <div class="header">
     <div class="hero">
-      <div class="hero-head">
+      <div class="hero-content">
         <div class="foto-perfil">
           {% if perfil.foto %}
-            <img src="{{ perfil.foto.url }}" alt="Foto de {{ perfil.nombres }}">
+            <img src="{{ perfil.foto.url }}" alt="Foto">
           {% else %}
-            <img src="https://ui-avatars.com/api/?name={{ perfil.nombres }}+{{ perfil.apellidos }}&background=0d1411&color=10b981&size=140" alt="Sin foto">
+            <img src="https://ui-avatars.com/api/?name={{ perfil.nombres }}+{{ perfil.apellidos }}&background=0d1411&color=10b981&size=150" alt="Sin foto">
           {% endif %}
         </div>
-
-        <div>
+        
+        <div class="info-principal">
           <h1 class="name">{{ perfil.apellidos }} {{ perfil.nombres }}</h1>
-          <p class="subtitle">{{ perfil.descripcionperfil|default:"Perfil profesional" }}</p>
-
-          <div class="chips">
-            {% if perfil.nacionalidad %}<span class="chip"><span class="dot"></span>{{ perfil.nacionalidad }}</span>{% endif %}
-            {% if perfil.numerocedula %}<span class="chip"><span class="dot"></span>CI: {{ perfil.numerocedula }}</span>{% endif %}
-            {% if perfil.get_sexo_display %}<span class="chip"><span class="dot"></span>{{ perfil.get_sexo_display }}</span>{% endif %}
-            {% if perfil.estadocivil %}<span class="chip"><span class="dot"></span>{{ perfil.estadocivil }}</span>{% endif %}
+          <p class="subtitle">{{ perfil.descripcionperfil|default:"Profesional en desarrollo" }}</p>
+          
+          <div class="personal-data">
+            <div class="data-item">
+              <span class="k">Identificación</span>
+              <span class="v">{{ perfil.numerocedula }}</span>
+            </div>
+            <div class="data-item">
+              <span class="k">Género</span>
+              <span class="v">{{ perfil.sexo_texto }}</span>
+            </div>
+            <div class="data-item">
+              <span class="k">Nacionalidad</span>
+              <span class="v">{{ perfil.nacionalidad|default:"No definida" }}</span>
+            </div>
+            <div class="data-item">
+              <span class="k">Conducción</span>
+              <span class="v">Licencia {{ perfil.licencia_texto }}</span>
+            </div>
+            <div class="data-item">
+              <span class="k">Estado Civil</span>
+              <span class="v">{{ perfil.estadocivil|default:"No definido" }}</span>
+            </div>
+            <div class="data-item">
+              <span class="k">Nacimiento</span>
+              <span class="v">{{ perfil.fechanacimiento|date:"d M, Y" }}</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
     <div class="aside">
-      <h3>Contacto y ubicación</h3>
-      <div class="kv">
-        <div class="row"><div class="k">Teléfono</div><div class="v">{{ perfil.telefonoconvencional|default_if_none:"" }}</div></div>
-        <div class="row"><div class="k">Dir. domicilio</div><div class="v">{{ perfil.direcciondomiciliaria|default_if_none:"" }}</div></div>
-        <div class="row"><div class="k">Dir. trabajo</div><div class="v">{{ perfil.direcciontrabajo|default_if_none:"" }}</div></div>
-        <div class="row"><div class="k">Lugar nac.</div><div class="v">{{ perfil.lugarnacimiento|default_if_none:"" }}</div></div>
-        <div class="row"><div class="k">Fecha nac.</div><div class="v">{{ perfil.fechanacimiento|default_if_none:"" }}</div></div>
+      <h3>Contacto Directo</h3>
+      <div class="contact-kv">
+        <div>
+            <div class="k">Teléfono / Celular</div>
+            <div class="v">{{ perfil.telefonoconvencional|default:perfil.telefonofijo|default:"No registrado" }}</div>
+        </div>
+        <div>
+            <div class="k">Residencia</div>
+            <div class="v">{{ perfil.direcciondomiciliaria|default:"No registrada" }}</div>
+        </div>
+        {% if perfil.sitioweb %}
+        <div>
+            <div class="k">Sitio Web</div>
+            <div class="v"><a href="{{ perfil.sitioweb }}" target="_blank">Visitar Portafolio ↗</a></div>
+        </div>
+        {% endif %}
       </div>
+      
+      <a href="{% url 'hojavida:lista_venta_garage' %}" class="back btn-garage">
+          🛒 Ir a Venta de Garage
+      </a>
     </div>
   </div>
 
-  <div class="grid">
-
+  <div class="grid-cards">
     <div class="card">
-      <h2>Experiencia laboral <span class="hint">Últimos trabajos</span></h2>
+      <h2>Experiencia laboral <span class="hint">Trayectoria</span></h2>
       {% if experiencias %}
         <div class="timeline">
           {% for e in experiencias %}
             <div class="item">
-              <p class="title">{{ e.cargodesempenado }}{% if e.nombrempresa %} — {{ e.nombrempresa }}{% endif %}</p>
-              <p class="meta">{{ e.fechainiciogestion }} → {{ e.fechafingestion }}</p>
-              {% if e.descripcionfunciones %}<p class="desc">{{ e.descripcionfunciones }}</p>{% endif %}
+              <p class="title">{{ e.cargodesempenado }}</p>
+              <p class="meta"><strong>{{ e.nombrempresa }}</strong> | {{ e.fechainiciogestion }} → {{ e.fechafingestion|default:"Actualidad" }}</p>
+              <p class="desc" style="font-size:13px; margin-top:5px; color:var(--text); opacity:0.8;">{{ e.descripcionfunciones }}</p>
             </div>
           {% endfor %}
         </div>
       {% else %}
-        <div class="empty">Sin registros.</div>
+        <div class="empty">Sin registros de experiencia.</div>
       {% endif %}
     </div>
 
     <div class="card">
-      <h2>Cursos realizados <span class="hint">Formación</span></h2>
+      <h2>Cursos y Formación <span class="hint">Educación</span></h2>
       {% if cursos %}
         <div class="timeline">
           {% for c in cursos %}
             <div class="item">
               <p class="title">{{ c.nombrecurso }}</p>
-              <p class="meta">{{ c.fechainicio }} → {{ c.fechafin }} · {{ c.totalhoras }} horas</p>
+              <p class="meta">{{ c.totalhoras }} horas acumuladas | Finalizado: {{ c.fechafin }}</p>
             </div>
           {% endfor %}
         </div>
       {% else %}
-        <div class="empty">Sin registros.</div>
+        <div class="empty">No hay cursos registrados.</div>
       {% endif %}
     </div>
 
     <div class="card">
       <h2>Reconocimientos <span class="hint">Logros</span></h2>
-
       {% if reconocimientos %}
         <div class="timeline">
           {% for r in reconocimientos %}
             <div class="item">
-              <p class="title">
-                {{ r.get_tiporeconocimiento_display }}
-                {% if r.fechareconocimiento %} — {{ r.fechareconocimiento }}{% endif %}
-              </p>
-
-              {% if r.descripcionreconocimiento %}
-                <p class="desc">{{ r.descripcionreconocimiento }}</p>
-              {% endif %}
-
-              {% if r.institucioncertificado %}
-                <p class="meta">Institución del certificado: {{ r.institucioncertificado }}</p>
-              {% endif %}
-
-              {% if r.fotocertificado %}
-                <p class="meta">Certificado:</p>
-                <a href="{{ r.fotocertificado.url }}" target="_blank" rel="noopener">
-                  <img src="{{ r.fotocertificado.url }}" alt="Certificado" style="max-width:100%; border-radius:12px; border:1px solid var(--line); margin-top:6px;">
-                </a>
-
-                <div style="margin-top:10px;">
-                  <a class="back" href="{{ r.fotocertificado.url }}" target="_blank" rel="noopener">Ver en grande</a>
-                  <a class="back" href="{{ r.fotocertificado.url }}" download style="margin-left:8px;">Descargar</a>
-                </div>
-              {% endif %}
+              <p class="title">{{ r.tiporeconocimiento }}</p>
+              <p class="meta"><i>{{ r.institucioncertificado }}</i> ({{ r.fechareconocimiento }})</p>
             </div>
           {% endfor %}
         </div>
       {% else %}
-        <div class="empty">Sin registros.</div>
+        <div class="empty">Sin reconocimientos registrados.</div>
       {% endif %}
+    </div>
+
+    <div class="card">
+        <h2>Mi Portafolio <span class="hint">Proyectos</span></h2>
+        {% if productos_laborales or productos_academicos %}
+            <div class="product-grid">
+                {% for p in productos_laborales %}
+                    <div class="product-item">
+                        {% if p.foto_producto %}<img src="{{ p.foto_producto.url }}">{% endif %}
+                        <div class="product-info"><strong>{{ p.nombreproducto }}</strong><br><span class="meta" style="color:var(--accent)">Laboral</span></div>
+                    </div>
+                {% endfor %}
+                {% for a in productos_academicos %}
+                    <div class="product-item">
+                        {% if a.foto_producto %}<img src="{{ a.foto_producto.url }}">{% endif %}
+                        <div class="product-info"><strong>{{ a.nombreproducto }}</strong><br><span class="meta" style="color:var(--muted)">Académico</span></div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty">No hay proyectos para mostrar.</div>
+        {% endif %}
     </div>
 
   </div>

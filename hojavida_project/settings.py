@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     "storages",  # django-storages (Azure)
 
     # apps locales
-    "hojavida",
+    "hojavida",  # CORREGIDO: Volvemos al nombre original de tu carpeta
 ]
 
 # ---------------------------------------------------------------------
@@ -50,7 +50,7 @@ INSTALLED_APPS = [
 # ---------------------------------------------------------------------
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",  # NECESARIO PARA EL DISEÑO DEL ADMIN
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # Necesario para estáticos en Render
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -71,6 +71,7 @@ TEMPLATES = [
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
+                "django.template.context_processors.debug",
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
@@ -125,12 +126,12 @@ USE_I18N = True
 USE_TZ = True
 
 # ---------------------------------------------------------------------
-# Archivos estáticos (Configuración WhiteNoise para Render)
+# Archivos estáticos
 # ---------------------------------------------------------------------
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# Almacenamiento optimizado para estáticos en Render
+# Almacenamiento optimizado para estáticos
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # ---------------------------------------------------------------------

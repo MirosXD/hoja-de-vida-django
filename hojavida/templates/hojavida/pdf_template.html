@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: letter;
+            margin: 1cm;
+        }
+        body {
+            font-family: 'Helvetica', Arial, sans-serif;
+            font-size: 9pt;
+            color: #2d3748;
+            line-height: 1.3;
+        }
+
+        /* ENCABEZADO CON FOTO CIRCULAR */
+        .header-container {
+            border-bottom: 2px solid #10b981;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .profile-table { width: 100%; }
+        
+        /* Contenedor fijo para la foto de perfil */
+        .photo-frame {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid #10b981;
+            overflow: hidden;
+            text-align: center;
+        }
+        .profile-photo {
+            width: 100%; /* Se adapta al ancho del círculo */
+            height: auto;
+            display: block;
+        }
+
+        .name-title {
+            font-size: 22pt;
+            font-weight: bold;
+            color: #064e3b;
+            margin: 0;
+        }
+
+        /* SECCIONES */
+        .section-title {
+            background-color: #f0fdf4;
+            color: #064e3b;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-left: 4px solid #10b981;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            font-size: 10pt;
+        }
+
+        .data-grid { width: 100%; margin-bottom: 10px; }
+        .label { font-weight: bold; color: #4a5568; width: 20%; }
+        
+        .content-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        .content-table th {
+            background-color: #f7fafc;
+            text-align: left;
+            padding: 6px;
+            border-bottom: 1px solid #edf2f7;
+            font-size: 8pt;
+        }
+        .content-table td {
+            padding: 8px 6px;
+            border-bottom: 1px solid #f7fafc;
+            vertical-align: top;
+        }
+
+        /* Contenedor de miniaturas para productos y certificados */
+        .thumb-container {
+            width: 80px;
+            height: 80px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            overflow: hidden;
+            text-align: center;
+            background-color: #f7fafc;
+        }
+        .thumb {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .description-text {
+            font-size: 8.5pt;
+            color: #4a5568;
+            text-align: justify;
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+
+        .price-tag {
+            color: #059669;
+            font-weight: bold;
+            font-size: 10pt;
+            margin-top: 5px;
+            background: #ecfdf5;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <table class="profile-table">
+            <tr>
+                <td style="width: 115px;">
+                    {% if foto_perfil_url %}
+                        <div class="photo-frame">
+                            <img src="{{ foto_perfil_url }}" class="profile-photo">
+                        </div>
+                    {% endif %}
+                </td>
+                <td>
+                    <h1 class="name-title">{{ perfil.nombres }} {{ perfil.apellidos }}</h1>
+                    <p style="margin: 2px 0;">{{ perfil.numerocedula }} | {{ perfil.telefonofijo|default:perfil.telefonoconvencional }}</p>
+                    <p style="margin: 2px 0; color: #718096;">{{ perfil.direcciondomiciliaria }}</p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section-title">Información del Perfil</div>
+    <table class="data-grid">
+        <tr>
+            <td class="label">Cédula:</td><td>{{ perfil.numerocedula }}</td>
+            <td class="label">Sexo:</td><td>{{ perfil.sexo_texto }}</td>
+        </tr>
+        <tr>
+            <td class="label">Estado Civil:</td><td>{{ perfil.estadocivil }}</td>
+            <td class="label">Licencia:</td><td>{{ perfil.licencia_texto }}</td>
+        </tr>
+        <tr>
+            <td class="label">Nacionalidad:</td><td>{{ perfil.nacionalidad }}</td>
+            <td class="label">Web:</td><td>{{ perfil.sitioweb|default:"-" }}</td>
+        </tr>
+    </table>
+
+    <div class="description-text" style="margin-bottom: 15px;">
+        <strong>Resumen Profesional:</strong> {{ perfil.descripcionperfil }}
+    </div>
+
+    <div class="section-title">Experiencia Laboral</div>
+    <table class="content-table">
+        <thead>
+            <tr>
+                <th style="width: 25%;">Periodo</th>
+                <th style="width: 75%;">Cargo y Funciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for exp in experiencias %}
+            <tr>
+                <td>{{ exp.fechainiciogestion }} - {{ exp.fechafingestion|default:"Presente" }}</td>
+                <td>
+                    <strong>{{ exp.cargodesempenado }}</strong> en <em>{{ exp.nombrempresa }}</em>
+                    <div class="description-text">{{ exp.descripcionfunciones }}</div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="section-title">Formación y Cursos</div>
+    <table class="content-table">
+        {% for curso in cursos %}
+        <tr>
+            <td style="width: 25%;">{{ curso.fechafin }}</td>
+            <td>
+                <strong>{{ curso.nombrecurso }}</strong> ({{ curso.totalhoras }} hrs)
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    {% if productos_laborales or productos_academicos %}
+    <div class="section-title">Portafolio y Productos Vinculados</div>
+    <table class="content-table">
+        {% for p in productos_laborales %}
+        <tr>
+            <td style="width: 90px;">
+                <div class="thumb-container">
+                    {% if p.sas_url %}<img src="{{ p.sas_url }}" class="thumb">{% endif %}
+                </div>
+            </td>
+            <td>
+                <strong>{{ p.nombreproducto }}</strong> (Laboral)
+                <div class="description-text">{{ p.descripcion|truncatechars:200 }}</div>
+            </td>
+        </tr>
+        {% endfor %}
+        {% for a in productos_academicos %}
+        <tr>
+            <td style="width: 90px;">
+                <div class="thumb-container">
+                    {% if a.sas_url %}<img src="{{ a.sas_url }}" class="thumb">{% endif %}
+                </div>
+            </td>
+            <td>
+                <strong>{{ a.nombreproducto }}</strong> (Académico)
+                <div class="description-text">{{ a.descripcion|truncatechars:200 }}</div>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+
+    <div class="page-break"></div>
+
+    <div class="section-title">Catálogo de Venta de Garage</div>
+    <p style="font-size: 8pt; color: #718096; margin-bottom: 10px;">Artículos publicados por el usuario vinculados a este perfil.</p>
+    
+    <table class="content-table">
+        {% for item in venta_garage %}
+        <tr>
+            <td style="width: 90px;">
+                <div class="thumb-container">
+                    {% if item.sas_url %}
+                        <img src="{{ item.sas_url }}" class="thumb">
+                    {% endif %}
+                </div>
+            </td>
+            <td>
+                <strong style="font-size: 10pt; color: #2d3748;">{{ item.nombreproducto }}</strong>
+                <div class="description-text">{{ item.descripcion }}</div>
+                <div style="margin-top: 5px;">
+                    <span class="price-tag">Precio: ${{ item.precio_display }}</span>
+                </div>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="2" style="text-align: center; color: #a0aec0; padding: 20px;">
+                No hay productos en venta vinculados actualmente.
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    {% if reconocimientos %}
+    <div class="section-title">Reconocimientos y Certificados</div>
+    <table class="content-table">
+        {% for r in reconocimientos %}
+        <tr>
+            <td style="width: 90px;">
+                <div class="thumb-container">
+                    {% if r.sas_url %}
+                        <img src="{{ r.sas_url }}" class="thumb">
+                    {% endif %}
+                </div>
+            </td>
+            <td>
+                <strong style="color: #2d3748;">{{ r.tiporeconocimiento }}</strong>
+                <p style="margin: 2px 0; color: #4a5568;">{{ r.institucioncertificado }}</p>
+                <p style="margin: 0; font-size: 8pt; color: #718096;">Fecha: {{ r.fechareconocimiento }}</p>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+
+</body>
+</html>

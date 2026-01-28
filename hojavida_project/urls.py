@@ -1,14 +1,16 @@
 from django.contrib import admin
 from django.urls import path, include
-from django.conf import settings  # Importante
-from django.conf.urls.static import static  # Importante
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", include("hojavida.urls", namespace="hojavida")),
+    
+    # MODIFICADO: Ahora apunta a tu carpeta original 'hojavida'
+    path("", include("hojavida.urls")), 
 ]
 
-# ESTA PARTE ES LA QUE SOLUCIONA EL ERROR DE LAS IMÁGENES:
-# Solo se activa en modo desarrollo (DEBUG=True)
+# Configuración para archivos multimedia (fotos, etc.) y estáticos en desarrollo
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

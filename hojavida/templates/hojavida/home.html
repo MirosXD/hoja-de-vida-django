@@ -14,6 +14,8 @@
       --glass-border: rgba(16, 185, 129, 0.15);
       --text-main: #ffffff;
       --text-dim: #7d8a85;   /* Gris Verdoso */
+      --accent-pdf: #ef4444; /* Rojo suave para PDF */
+      --accent-garage: #34d399; /* Verde brillante para el atajo */
     }
 
     * { box-sizing: border-box; }
@@ -50,7 +52,6 @@
       gap: 25px;
     }
 
-    /* Estilo de la Tarjeta */
     .profile-card {
       background: var(--card-bg);
       backdrop-filter: blur(12px);
@@ -86,8 +87,7 @@
     }
 
     .avatar {
-      width: 100%;
-      height: 100%;
+      width: 100%; height: 100%;
       border-radius: 50%;
       object-fit: cover;
       background: #0d1411;
@@ -122,6 +122,13 @@
       color: var(--text-dim);
     }
 
+    .card-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Estilo Botón Expediente */
     .btn-expediente {
       display: block;
       width: 100%;
@@ -133,12 +140,53 @@
       border-radius: 14px;
       font-weight: 600;
       font-size: 0.9rem;
-      transition: all 0.2s;
+      transition: 0.3s;
+    }
+
+    /* NUEVO: Estilo Botón Venta Garage (Atajo) */
+    .btn-garage-shortcut {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      text-align: center;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid var(--primary);
+      color: var(--accent-garage);
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: 0.3s;
+    }
+
+    .btn-pdf {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      text-align: center;
+      background: rgba(239, 68, 68, 0.05);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      color: var(--accent-pdf);
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: 500;
+      font-size: 0.85rem;
+      transition: 0.3s;
     }
 
     .btn-expediente:hover { 
-        filter: brightness(1.1);
+        filter: brightness(1.2);
         box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-garage-shortcut:hover {
+        background: var(--primary);
+        color: #fff;
+    }
+
+    .btn-pdf:hover {
+        background: rgba(239, 68, 68, 0.15);
+        border-color: var(--accent-pdf);
     }
 
     .empty-state {
@@ -188,15 +236,25 @@
             <div class="skills-title">Información</div>
             <div class="tags">
               <span class="tag">📍 {{ p.nacionalidad|default:"Global" }}</span>
-              <span class="tag">👤 {{ p.get_sexo_display|default:"No definido" }}</span>
+              <span class="tag">👤 {{ p.sexo_texto|default:"No definido" }}</span>
               {% if p.perfilactivo %}
                 <span class="tag" style="border-color: var(--primary); color: var(--primary);">✓ Activo</span>
               {% endif %}
             </div>
 
-            <a href="{% url 'hojavida:perfil_detalle' p.idperfil %}" class="btn-expediente">
-              Ver Expediente Completo
-            </a>
+            <div class="card-actions">
+                <a href="{% url 'hojavida:perfil_detalle' p.idperfil %}" class="btn-expediente">
+                  Ver Expediente Completo
+                </a>
+                
+                <a href="{% url 'hojavida:lista_venta_garage' %}" class="btn-garage-shortcut">
+                   🛒 Ver Venta de Garage
+                </a>
+                
+                <a href="{% url 'hojavida:generar_pdf_cv' p.idperfil %}" class="btn-pdf">
+                    📄 Descargar Hoja de Vida (PDF)
+                </a>
+            </div>
           </div>
         {% endfor %}
       {% else %}

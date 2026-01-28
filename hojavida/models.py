@@ -1,362 +1,222 @@
 from django.db import models
+from django.core.exceptions import ValidationError
+from django.utils import timezone
+from django.core.validators import RegexValidator
 
+# Validador para asegurar exactamente 10 dígitos numéricos
+telefono_validator = RegexValidator(
+    regex=r'^\d{10}$',
+    message="El número debe tener exactamente 10 dígitos numéricos."
+)
 
 # ======================================================
 # DATOS PERSONALES
 # ======================================================
 class DatosPersonales(models.Model):
-    SEXO_H = "H"
-    SEXO_M = "M"
-    SEXO_CHOICES = [
-        (SEXO_H, "Hombre"),
-        (SEXO_M, "Mujer"),
+    idperfil = models.AutoField(primary_key=True)
+    descripcionperfil = models.CharField(max_length=50, blank=True, null=True)
+    perfilactivo = models.IntegerField(default=1, blank=True, null=True)
+    apellidos = models.CharField(max_length=60, blank=True, null=True)
+    nombres = models.CharField(max_length=60, blank=True, null=True)
+    nacionalidad = models.CharField(max_length=20, blank=True, null=True)
+    lugarnacimiento = models.CharField(max_length=60, blank=True, null=True)
+    fechanacimiento = models.DateField(blank=True, null=True)
+    
+    # Cédula con validación estricta
+    numerocedula = models.CharField(unique=True, max_length=10, validators=[telefono_validator])
+    
+    # SEXO: Ahora como desplegable (Masculino/Femenino)
+    OPCIONES_SEXO = [
+        ('M', 'Masculino'),
+        ('F', 'Femenino'),
     ]
-
-    idperfil = models.AutoField("ID del perfil", primary_key=True)
-
-    descripcionperfil = models.CharField(
-        "Descripción del perfil", max_length=50, blank=True, null=True
-    )
-    perfilactivo = models.IntegerField("Perfil activo", blank=True, null=True)
-
-    apellidos = models.CharField("Apellidos", max_length=60, blank=True, null=True)
-    nombres = models.CharField("Nombres", max_length=60, blank=True, null=True)
-
-    nacionalidad = models.CharField("Nacionalidad", max_length=20, blank=True, null=True)
-    lugarnacimiento = models.CharField(
-        "Lugar de nacimiento", max_length=60, blank=True, null=True
-    )
-    fechanacimiento = models.DateField(
-        "Fecha de nacimiento", blank=True, null=True
-    )
-
-    numerocedula = models.CharField(
-        "Número de cédula", max_length=10, unique=True
-    )
     sexo = models.CharField(
-        "Sexo", max_length=1, choices=SEXO_CHOICES, blank=True, null=True
+        db_column='sexo', 
+        max_length=1, 
+        choices=OPCIONES_SEXO,
+        blank=True, 
+        null=True,
+        verbose_name="Sexo"
     )
-
-    estadocivil = models.CharField(
-        "Estado civil", max_length=50, blank=True, null=True
-    )
+    
+    estadocivil = models.CharField(max_length=50, blank=True, null=True)
+    
+    # LICENCIA: Ahora solo con Si y No (Sin Talvez)
+    OPCIONES_LICENCIA = [
+        ('Si', 'Si'),
+        ('No', 'No'),
+    ]
     licenciaconducir = models.CharField(
-        "Licencia de conducir", max_length=6, blank=True, null=True
+        db_column='licenciaconducir', 
+        max_length=10, 
+        blank=True, 
+        null=True,
+        choices=OPCIONES_LICENCIA,
+        verbose_name="¿Tiene licencia de conducir?"
     )
+    
+    # TELÉFONOS con validación de 10 dígitos
+    telefonoconvencional = models.CharField(max_length=10, validators=[telefono_validator], blank=True, null=True)
+    telefonofijo = models.CharField(max_length=10, validators=[telefono_validator], blank=True, null=True)
+    
+    direcciontrabajo = models.CharField(max_length=50, blank=True, null=True)
+    direcciondomiciliaria = models.CharField(max_length=50, blank=True, null=True)
+    sitioweb = models.CharField(max_length=60, blank=True, null=True)
+    foto = models.ImageField(upload_to='fotos_perfil/', blank=True, null=True)
 
-    telefonoconvencional = models.CharField(
-        "Teléfono convencional", max_length=15, blank=True, null=True
-    )
-    telefonofijo = models.CharField(
-        "Teléfono fijo", max_length=15, blank=True, null=True
-    )
-
-    direcciontrabajo = models.CharField(
-        "Dirección de trabajo", max_length=50, blank=True, null=True
-    )
-    direcciondomiciliaria = models.CharField(
-        "Dirección domiciliaria", max_length=50, blank=True, null=True
-    )
-
-    sitioweb = models.CharField(
-        "Sitio web", max_length=60, blank=True, null=True
-    )
-    foto = models.ImageField(
-        "Foto", upload_to="fotos/", blank=True, null=True
-    )
+    def clean(self):
+        # Validación extra de seguridad: Longitud exacta 10
+        campos_validar = {
+            'numerocedula': self.numerocedula,
+            'telefonoconvencional': self.telefonoconvencional,
+            'telefonofijo': self.telefonofijo
+        }
+        for campo, valor in campos_validar.items():
+            if valor and len(str(valor)) != 10:
+                raise ValidationError({campo: "Error: Este campo debe tener exactamente 10 dígitos."})
+            
+        if self.fechanacimiento and self.fechanacimiento > timezone.now().date():
+            raise ValidationError({'fechanacimiento': "Error: La fecha de nacimiento no puede ser futura."})
 
     class Meta:
-        db_table = "datospersonales"
-        verbose_name = "Datos personales"
-        verbose_name_plural = "Datos personales"
+        managed = False
+        db_table = 'datospersonales'
+        verbose_name = "Datos Personales"
+        verbose_name_plural = "Datos Personales"
 
     def __str__(self):
-        return (
-            f"{self.apellidos or ''} {self.nombres or ''}".strip()
-            or f"Perfil {self.idperfil}"
-        )
-
+        return f"{self.nombres} {self.apellidos}"
 
 # ======================================================
 # EXPERIENCIA LABORAL
 # ======================================================
 class ExperienciaLaboral(models.Model):
-    idexperiencialaboral = models.AutoField(
-        "ID experiencia laboral", primary_key=True
-    )
+    idexperiencialaboral = models.AutoField(primary_key=True)
+    cargodesempenado = models.CharField(max_length=100, blank=True, null=True)
+    nombrempresa = models.CharField(max_length=50, blank=True, null=True)
+    fechainiciogestion = models.DateField(blank=True, null=True)
+    fechafingestion = models.DateField(blank=True, null=True)
+    descripcionfunciones = models.CharField(max_length=100, blank=True, null=True)
+    activarparaqueseveaenfront = models.BooleanField(default=True)
+    rutacertificado = models.FileField(upload_to='certificados_laborales/', blank=True, null=True)
+    perfil = models.ForeignKey(DatosPersonales, on_delete=models.CASCADE)
 
-    perfil = models.ForeignKey(
-        DatosPersonales,
-        verbose_name="Perfil",
-        on_delete=models.CASCADE,
-        related_name="experiencias_laborales",
-    )
-
-    cargodesempenado = models.CharField(
-        "Cargo desempeñado", max_length=100, blank=True, null=True
-    )
-    nombrempresa = models.CharField(
-        "Nombre de la empresa", max_length=50, blank=True, null=True
-    )
-
-    fechainiciogestion = models.DateField(
-        "Fecha de inicio", blank=True, null=True
-    )
-    fechafingestion = models.DateField(
-        "Fecha de fin", blank=True, null=True
-    )
-
-    descripcionfunciones = models.CharField(
-        "Descripción de funciones", max_length=100, blank=True, null=True
-    )
-
-    activarparaqueseveaenfront = models.BooleanField(
-        "Mostrar en la hoja de vida", default=True
-    )
-    rutacertificado = models.CharField(
-        "Ruta del certificado", max_length=100, blank=True, null=True
-    )
+    def clean(self):
+        if self.fechainiciogestion and self.fechafingestion:
+            if self.fechainiciogestion > self.fechafingestion:
+                raise ValidationError("Error: La fecha de inicio no puede ser posterior a la de fin.")
+        
+        if self.perfil.fechanacimiento and self.fechainiciogestion:
+            if self.fechainiciogestion < self.perfil.fechanacimiento:
+                raise ValidationError("Error: No puedes registrar experiencia laboral anterior a tu fecha de nacimiento.")
 
     class Meta:
-        db_table = "experiencialaboral"
-        verbose_name = "Experiencia laboral"
-        verbose_name_plural = "Experiencias laborales"
+        managed = False
+        db_table = 'experiencialaboral'
 
-    def __str__(self):
-        return f"{self.cargodesempenado or ''} - {self.nombrempresa or ''}".strip()
+# ======================================================
+# PRODUCTOS LABORALES
+# ======================================================
+class ProductosLaborales(models.Model):
+    idproductoslaborales = models.AutoField(primary_key=True)
+    nombreproducto = models.CharField(max_length=100, blank=True, null=True)
+    fechaproducto = models.DateField(blank=True, null=True)
+    descripcion = models.CharField(max_length=100, blank=True, null=True)
+    activarparaqueseveaenfront = models.BooleanField(default=True)
+    foto_producto = models.ImageField(upload_to='productos_laborales/', blank=True, null=True)
+    perfil = models.ForeignKey(DatosPersonales, on_delete=models.CASCADE)
 
+    def clean(self):
+        if self.fechaproducto and self.fechaproducto > timezone.now().date():
+            raise ValidationError("Error: La fecha del producto no puede ser futura.")
+
+    class Meta:
+        managed = False
+        db_table = 'productoslaborales'
 
 # ======================================================
 # RECONOCIMIENTOS
 # ======================================================
-class Reconocimiento(models.Model):
-    TIPO_ACADEMICO = "Académico"
-    TIPO_PUBLICO = "Público"
-    TIPO_PRIVADO = "Privado"
-    TIPO_CHOICES = [
-        (TIPO_ACADEMICO, "Académico"),
-        (TIPO_PUBLICO, "Público"),
-        (TIPO_PRIVADO, "Privado"),
-    ]
+class Reconocimientos(models.Model):
+    idreconocimiento = models.AutoField(primary_key=True)
+    tiporeconocimiento = models.CharField(max_length=100, blank=True, null=True)
+    fechareconocimiento = models.DateField(blank=True, null=True)
+    descripcionreconocimiento = models.CharField(max_length=100, blank=True, null=True)
+    institucioncertificado = models.CharField(max_length=150, blank=True, null=True)
+    fotocertificado = models.ImageField(upload_to='reconocimientos_fotos/', blank=True, null=True)
+    activarparaqueseveaenfront = models.BooleanField(default=True)
+    rutacertificado = models.FileField(upload_to='reconocimientos_docs/', blank=True, null=True)
+    perfil = models.ForeignKey(DatosPersonales, on_delete=models.CASCADE)
 
-    idreconocimiento = models.AutoField(
-        "ID reconocimiento", primary_key=True
-    )
-
-    perfil = models.ForeignKey(
-        DatosPersonales,
-        verbose_name="Perfil",
-        on_delete=models.CASCADE,
-        related_name="reconocimientos",
-    )
-
-    tiporeconocimiento = models.CharField(
-        "Tipo de reconocimiento",
-        max_length=100,
-        choices=TIPO_CHOICES,
-        blank=True,
-        null=True,
-    )
-    fechareconocimiento = models.DateField(
-        "Fecha de reconocimiento", blank=True, null=True
-    )
-    descripcionreconocimiento = models.CharField(
-        "Descripción", max_length=100, blank=True, null=True
-    )
-
-    institucioncertificado = models.CharField(
-        "Institución del certificado", max_length=150, blank=True, null=True
-    )
-    fotocertificado = models.ImageField(
-        "Foto del certificado",
-        upload_to="certificados/reconocimientos/",
-        blank=True,
-        null=True,
-    )
-
-    activarparaqueseveaenfront = models.BooleanField(
-        "Mostrar en la hoja de vida", default=True
-    )
-    rutacertificado = models.CharField(
-        "Ruta del certificado", max_length=100, blank=True, null=True
-    )
+    def clean(self):
+        if self.fechareconocimiento and self.fechareconocimiento > timezone.now().date():
+            raise ValidationError("Error: El reconocimiento no puede tener una fecha futura.")
 
     class Meta:
-        db_table = "reconocimientos"
-        verbose_name = "Reconocimiento"
-        verbose_name_plural = "Reconocimientos"
-
-    def __str__(self):
-        return f"{self.tiporeconocimiento or 'Reconocimiento'} - {self.perfil_id}"
-
+        managed = False
+        db_table = 'reconocimientos'
 
 # ======================================================
 # CURSOS REALIZADOS
 # ======================================================
-class CursoRealizado(models.Model):
-    idcursorealizado = models.AutoField(
-        "ID curso realizado", primary_key=True
-    )
+class CursosRealizados(models.Model):
+    idcursorealizado = models.AutoField(primary_key=True)
+    nombrecurso = models.CharField(max_length=100, blank=True, null=True)
+    fechainicio = models.DateField(blank=True, null=True)
+    fechafin = models.DateField(blank=True, null=True)
+    totalhoras = models.IntegerField(blank=True, null=True)
+    activarparaqueseveaenfront = models.BooleanField(default=True)
+    rutacertificado = models.ImageField(upload_to='cursos_certificados/', blank=True, null=True)
+    perfil = models.ForeignKey(DatosPersonales, on_delete=models.CASCADE)
 
-    perfil = models.ForeignKey(
-        DatosPersonales,
-        verbose_name="Perfil",
-        on_delete=models.CASCADE,
-        related_name="cursos_realizados",
-    )
-
-    nombrecurso = models.CharField(
-        "Nombre del curso", max_length=100, blank=True, null=True
-    )
-    fechainicio = models.DateField(
-        "Fecha de inicio", blank=True, null=True
-    )
-    fechafin = models.DateField(
-        "Fecha de fin", blank=True, null=True
-    )
-    totalhoras = models.IntegerField(
-        "Total de horas", blank=True, null=True
-    )
-
-    activarparaqueseveaenfront = models.BooleanField(
-        "Mostrar en la hoja de vida", default=True
-    )
-    rutacertificado = models.CharField(
-        "Ruta del certificado", max_length=100, blank=True, null=True
-    )
+    def clean(self):
+        if self.fechainicio and self.fechafin:
+            if self.fechainicio > self.fechafin:
+                raise ValidationError("Error: La fecha de fin del curso no puede ser anterior al inicio.")
+        if self.totalhoras is not None and self.totalhoras < 0:
+            raise ValidationError("Error: El total de horas no puede ser negativo.")
 
     class Meta:
-        db_table = "cursosrealizados"
-        verbose_name = "Curso realizado"
-        verbose_name_plural = "Cursos realizados"
-
-    def __str__(self):
-        return self.nombrecurso or f"Curso {self.idcursorealizado}"
-
+        managed = False
+        db_table = 'cursosrealizados'
 
 # ======================================================
-# PRODUCTO ACADÉMICO
+# PRODUCTOS ACADÉMICOS
 # ======================================================
-class ProductoAcademico(models.Model):
-    idproductoacademico = models.AutoField(
-        "ID producto académico", primary_key=True
-    )
+class ProductosAcademicos(models.Model):
+    idproductoacademico = models.AutoField(primary_key=True)
+    nombreproducto = models.CharField(max_length=100, blank=True, null=True)
+    fechaproducto = models.DateField(blank=True, null=True)
+    descripcion = models.CharField(max_length=100, blank=True, null=True)
+    activarparaqueseveaenfront = models.BooleanField(default=True)
+    foto_producto = models.ImageField(upload_to='productos_academicos/', blank=True, null=True)
+    perfil = models.ForeignKey(DatosPersonales, on_delete=models.CASCADE)
 
-    perfil = models.ForeignKey(
-        DatosPersonales,
-        verbose_name="Perfil",
-        on_delete=models.CASCADE,
-        related_name="productos_academicos",
-    )
-
-    nombreproducto = models.CharField(
-        "Nombre del producto", max_length=100, blank=True, null=True
-    )
-    fechaproducto = models.DateField(
-        "Fecha del producto", blank=True, null=True
-    )
-    descripcion = models.CharField(
-        "Descripción", max_length=100, blank=True, null=True
-    )
-
-    activarparaqueseveaenfront = models.BooleanField(
-        "Mostrar en la hoja de vida", default=True
-    )
+    def clean(self):
+        if self.fechaproducto and self.fechaproducto > timezone.now().date():
+            raise ValidationError("Error: La fecha del producto académico no puede ser futura.")
 
     class Meta:
-        db_table = "productosacademicos"
-        verbose_name = "Producto académico"
-        verbose_name_plural = "Productos académicos"
-
-    def __str__(self):
-        return self.nombreproducto or f"Producto Acad. {self.idproductoacademico}"
-
-
-# ======================================================
-# PRODUCTO LABORAL
-# ======================================================
-class ProductoLaboral(models.Model):
-    idproductoslaborales = models.AutoField(
-        "ID producto laboral", primary_key=True
-    )
-
-    perfil = models.ForeignKey(
-        DatosPersonales,
-        verbose_name="Perfil",
-        on_delete=models.CASCADE,
-        related_name="productos_laborales",
-    )
-
-    nombreproducto = models.CharField(
-        "Nombre del producto", max_length=100, blank=True, null=True
-    )
-    fechaproducto = models.DateField(
-        "Fecha del producto", blank=True, null=True
-    )
-    descripcion = models.CharField(
-        "Descripción", max_length=100, blank=True, null=True
-    )
-
-    activarparaqueseveaenfront = models.BooleanField(
-        "Mostrar en la hoja de vida", default=True
-    )
-
-    class Meta:
-        db_table = "productoslaborales"
-        verbose_name = "Producto laboral"
-        verbose_name_plural = "Productos laborales"
-
-    def __str__(self):
-        return self.nombreproducto or f"Producto Lab. {self.idproductoslaborales}"
-
+        managed = False
+        db_table = 'productosacademicos'
 
 # ======================================================
 # VENTA GARAGE
 # ======================================================
 class VentaGarage(models.Model):
-    ESTADO_BUENO = "Bueno"
-    ESTADO_REGULAR = "Regular"
-    ESTADO_CHOICES = [
-        (ESTADO_BUENO, "Bueno"),
-        (ESTADO_REGULAR, "Regular"),
-    ]
+    idventagarage = models.AutoField(primary_key=True)
+    nombreproducto = models.CharField(max_length=100, blank=True, null=True)
+    estadoproducto = models.CharField(max_length=40, blank=True, null=True)
+    descripcion = models.CharField(max_length=100, blank=True, null=True)
+    valordelbien = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    activarparaqueseveaenfront = models.BooleanField(default=True)
+    foto = models.ImageField(upload_to='venta_garage/', blank=True, null=True)
+    perfil = models.ForeignKey(DatosPersonales, on_delete=models.CASCADE)
 
-    idventagarage = models.AutoField(
-        "ID venta garage", primary_key=True
-    )
-
-    perfil = models.ForeignKey(
-        DatosPersonales,
-        verbose_name="Perfil",
-        on_delete=models.CASCADE,
-        related_name="venta_garage",
-    )
-
-    nombreproducto = models.CharField(
-        "Nombre del producto", max_length=100, blank=True, null=True
-    )
-    estadoproducto = models.CharField(
-        "Estado del producto",
-        max_length=40,
-        choices=ESTADO_CHOICES,
-        blank=True,
-        null=True,
-    )
-    descripcion = models.CharField(
-        "Descripción", max_length=100, blank=True, null=True
-    )
-
-    valordelbien = models.DecimalField(
-        "Valor del bien", max_digits=5, decimal_places=2, blank=True, null=True
-    )
-    activarparaqueseveaenfront = models.BooleanField(
-        "Mostrar en la hoja de vida", default=True
-    )
+    def clean(self):
+        if self.valordelbien is not None and self.valordelbien < 0:
+            raise ValidationError("Error: El valor del bien no puede ser negativo.")
 
     class Meta:
-        db_table = "ventagarage"
-        verbose_name = "Venta garage"
-        verbose_name_plural = "Venta garage"
-
-    def __str__(self):
-        return self.nombreproducto or f"Item {self.idventagarage}"
+        managed = False
+        db_table = 'ventagarage'

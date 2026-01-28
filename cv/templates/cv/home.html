@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de CV</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f4f4f9;">
+
+    <div style="text-align: center; margin-top: 100px; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; width: 80%; max-width: 500px; margin-left: auto; margin-right: auto;">
+        
+        <h2 style="color: #333;">Mi Hoja de Vida Automatizada</h2>
+        <p style="color: #666; margin-bottom: 30px;">Genera tu CV profesional en formato PDF con un solo clic.</p>
+        
+        {% if perfil %}
+            <a href="{% url 'cv:generar_pdf_cv' perfil.idperfil %}" 
+               style="background-color: #007bff; color: white; padding: 15px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 1.1em; display: inline-block; transition: background 0.3s;">
+                📄 Descargar Hoja de Vida (PDF)
+            </a>
+            <p style="margin-top: 15px; font-size: 0.8em; color: #999;">Generando CV para: <strong>{{ perfil.nombres }} {{ perfil.apellidos }}</strong></p>
+        {% else %}
+            <p style="color: #d9534f; font-weight: bold;">⚠️ No se encontró ningún perfil en la base de datos.</p>
+            <a href="/admin/" style="color: #007bff;">Ir al Admin para crear uno</a>
+        {% endif %}
+        
+    </div>
+
+</body>
+</html>

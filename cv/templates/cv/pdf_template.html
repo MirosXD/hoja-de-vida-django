@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: letter;
+            margin: 2cm;
+        }
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            color: #333;
+            line-height: 1.4;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .name {
+            font-size: 24pt;
+            font-weight: bold;
+            color: #007bff;
+            text-transform: uppercase;
+        }
+        .contact-info {
+            font-size: 10pt;
+            color: #666;
+        }
+        .section-title {
+            font-size: 14pt;
+            font-weight: bold;
+            background-color: #f0f0f0;
+            padding: 5px 10px;
+            margin-top: 15px;
+            border-left: 5px solid #007bff;
+        }
+        .item {
+            margin-bottom: 10px;
+            padding-left: 10px;
+        }
+        .item-title {
+            font-weight: bold;
+            font-size: 11pt;
+        }
+        .item-date {
+            font-style: italic;
+            color: #555;
+            font-size: 9pt;
+        }
+        .garage-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .garage-table th {
+            background-color: #007bff;
+            color: white;
+            padding: 5px;
+            font-size: 10pt;
+        }
+        .garage-table td {
+            border: 1px solid #ddd;
+            padding: 5px;
+            font-size: 9pt;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="name">{{ perfil.nombres }} {{ perfil.apellidos }}</div>
+        <div class="contact-info">
+            {{ perfil.correo }} | Tel: {{ perfil.telefono }} | {{ perfil.ciudad }}
+        </div>
+    </div>
+
+    <div class="section-title">PERFIL PROFESIONAL</div>
+    <div class="item">
+        <p>{{ perfil.descripcionperfil }}</p>
+    </div>
+
+    <div class="section-title">EXPERIENCIA LABORAL</div>
+    {% for exp in experiencias %}
+    <div class="item">
+        <div class="item-title">{{ exp.cargo }} en {{ exp.nombreempresa }}</div>
+        <div class="item-date">{{ exp.fechainicio }} - {% if exp.trabajaactualmente %}Actualidad{% else %}{{ exp.fechafin }}{% endif %}</div>
+        <p>{{ exp.descripcionresponsabilidades }}</p>
+    </div>
+    {% endfor %}
+
+    <div class="section-title">FORMACIÓN ACADÉMICA (CURSOS)</div>
+    {% for curso in cursos %}
+    <div class="item">
+        <div class="item-title">{{ curso.nombrecurso }}</div> <div class="item-date">Institución: {{ curso.institucion }} | Horas: {{ curso.numerodehoras }}</div>
+    </div>
+    {% endfor %}
+
+    {% if venta_garage %}
+    <div class="section-title">CATÁLOGO DE PRODUCTOS (VENTA GARAGE)</div>
+    <table class="garage-table">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Estado</th>
+                <th>Precio</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in venta_garage %}
+            <tr>
+                <td>{{ item.nombreproducto }}</td>
+                <td>{{ item.estadoproducto }}</td>
+                <td>${{ item.valordelbien }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+</body>
+</html>

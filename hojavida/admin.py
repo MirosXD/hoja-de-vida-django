@@ -1,93 +1,78 @@
 from django.contrib import admin
+from django.utils.html import format_html
 from .models import (
-    DatosPersonales,
-    ExperienciaLaboral,
-    Reconocimiento,
-    CursoRealizado,
-    ProductoAcademico,
-    ProductoLaboral,
-    VentaGarage,
+    DatosPersonales, ExperienciaLaboral, ProductosLaborales, 
+    Reconocimientos, CursosRealizados, ProductosAcademicos, VentaGarage
 )
 
-# --- CONFIGURACIÓN DE DATOS PERSONALES ---
+# Configuración del encabezado del panel
+admin.site.site_header = "Administración de Hoja de Vida"
+admin.site.index_title = "Módulos de Currículum"
+
 @admin.register(DatosPersonales)
 class DatosPersonalesAdmin(admin.ModelAdmin):
+    # 'get_sexo' mostrará el texto formateado en la lista
     list_display = (
-        "idperfil",
-        "apellidos",
-        "nombres",
-        "numerocedula",
-        "perfilactivo",
+        "idperfil", 
+        "apellidos", 
+        "nombres", 
+        "numerocedula", 
+        "get_sexo", 
+        "licenciaconducir", 
+        "perfilactivo"
     )
     search_fields = ("apellidos", "nombres", "numerocedula")
-    list_filter = ("perfilactivo",)
+    
+    # Filtros actualizados: se cambió 'sexo_masculino' por 'sexo'
+    list_filter = ("sexo", "nacionalidad", "perfilactivo", "licenciaconducir")
+    ordering = ('apellidos',)
 
-# --- CONFIGURACIÓN DE EXPERIENCIA LABORAL ---
+    @admin.display(description="Sexo")
+    def get_sexo(self, obj):
+        """Traduce los códigos M/F a texto legible en la lista"""
+        if obj.sexo == 'M':
+            return "Masculino"
+        elif obj.sexo == 'F':
+            return "Femenino"
+        return "No definido"
+
 @admin.register(ExperienciaLaboral)
 class ExperienciaLaboralAdmin(admin.ModelAdmin):
-    list_display = (
-        "idexperiencialaboral",
-        "perfil",
-        "cargodesempenado",
-        "nombrempresa",
-        "activarparaqueseveaenfront",
-    )
+    list_display = ("idexperiencialaboral", "nombrempresa", "cargodesempenado", "fechainiciogestion", "fechafingestion", "perfil")
+    search_fields = ("nombrempresa", "cargodesempenado", "perfil__apellidos", "perfil__nombres")
+    list_filter = ("activarparaqueseveaenfront", "fechainiciogestion")
+    raw_id_fields = ("perfil",)
+
+@admin.register(ProductosLaborales)
+class ProductosLaboralesAdmin(admin.ModelAdmin):
+    list_display = ("idproductoslaborales", "nombreproducto", "fechaproducto", "perfil")
+    search_fields = ("nombreproducto", "perfil__apellidos")
+    raw_id_fields = ("perfil",)
+
+@admin.register(Reconocimientos)
+class ReconocimientosAdmin(admin.ModelAdmin):
+    list_display = ("idreconocimiento", "tiporeconocimiento", "institucioncertificado", "fechareconocimiento", "perfil")
+    search_fields = ("tiporeconocimiento", "institucioncertificado", "perfil__apellidos")
+    list_filter = ("activarparaqueseveaenfront", "fechareconocimiento")
+    raw_id_fields = ("perfil",)
+
+@admin.register(CursosRealizados)
+class CursosRealizadosAdmin(admin.ModelAdmin):
+    list_display = ("idcursorealizado", "nombrecurso", "totalhoras", "fechainicio", "fechafin", "perfil")
+    search_fields = ("nombrecurso", "perfil__apellidos")
     list_filter = ("activarparaqueseveaenfront",)
-    search_fields = ("cargodesempenado", "nombrempresa")
+    raw_id_fields = ("perfil",)
 
-# --- CONFIGURACIÓN DE RECONOCIMIENTOS ---
-@admin.register(Reconocimiento)
-class ReconocimientoAdmin(admin.ModelAdmin):
-    list_display = (
-        "idreconocimiento",
-        "perfil",
-        "tiporeconocimiento",
-        "fechareconocimiento",
-        "activarparaqueseveaenfront",
-    )
-    list_filter = ("tiporeconocimiento", "activarparaqueseveaenfront")
-
-# --- CONFIGURACIÓN DE CURSOS ---
-@admin.register(CursoRealizado)
-class CursoRealizadoAdmin(admin.ModelAdmin):
-    list_display = (
-        "idcursorealizado",
-        "perfil",
-        "nombrecurso",
-        "totalhoras",
-        "activarparaqueseveaenfront",
-    )
+@admin.register(ProductosAcademicos)
+class ProductosAcademicosAdmin(admin.ModelAdmin):
+    list_display = ("idproductoacademico", "nombreproducto", "fechaproducto", "perfil")
+    search_fields = ("nombreproducto", "perfil__apellidos")
     list_filter = ("activarparaqueseveaenfront",)
+    raw_id_fields = ("perfil",)
 
-# --- CONFIGURACIÓN DE PRODUCTOS ACADÉMICOS ---
-@admin.register(ProductoAcademico)
-class ProductoAcademicoAdmin(admin.ModelAdmin):
-    list_display = (
-        "idproductoacademico",
-        "perfil",
-        "nombreproducto",
-        "activarparaqueseveaenfront",
-    )
-
-# --- CONFIGURACIÓN DE PRODUCTOS LABORALES ---
-@admin.register(ProductoLaboral)
-class ProductoLaboralAdmin(admin.ModelAdmin):
-    list_display = (
-        "idproductoslaborales",
-        "perfil",
-        "nombreproducto",
-        "activarparaqueseveaenfront",
-    )
-
-# --- CONFIGURACIÓN DE VENTA DE GARAGE ---
 @admin.register(VentaGarage)
 class VentaGarageAdmin(admin.ModelAdmin):
-    list_display = (
-        "idventagarage",
-        "perfil",
-        "nombreproducto",
-        "estadoproducto",
-        "valordelbien",
-        "activarparaqueseveaenfront",
-    )
+    list_display = ("idventagarage", "nombreproducto", "valordelbien", "estadoproducto", "perfil")
+    search_fields = ("nombreproducto", "perfil__apellidos")
     list_filter = ("estadoproducto", "activarparaqueseveaenfront")
+    raw_id_fields = ("perfil",)
