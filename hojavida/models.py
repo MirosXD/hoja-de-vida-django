@@ -41,7 +41,7 @@ class DatosPersonales(models.Model):
     
     estadocivil = models.CharField(max_length=50, blank=True, null=True)
     
-    # LICENCIA: Ahora solo con Si y No (Sin Talvez)
+    # LICENCIA: Ahora solo con Si y No
     OPCIONES_LICENCIA = [
         ('Si', 'Si'),
         ('No', 'No'),
@@ -79,7 +79,7 @@ class DatosPersonales(models.Model):
             raise ValidationError({'fechanacimiento': "Error: La fecha de nacimiento no puede ser futura."})
 
     class Meta:
-        managed = False
+        managed = True  # Cambiado a True para permitir migraciones
         db_table = 'datospersonales'
         verbose_name = "Datos Personales"
         verbose_name_plural = "Datos Personales"
@@ -111,7 +111,7 @@ class ExperienciaLaboral(models.Model):
                 raise ValidationError("Error: No puedes registrar experiencia laboral anterior a tu fecha de nacimiento.")
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'experiencialaboral'
 
 # ======================================================
@@ -131,7 +131,7 @@ class ProductosLaborales(models.Model):
             raise ValidationError("Error: La fecha del producto no puede ser futura.")
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'productoslaborales'
 
 # ======================================================
@@ -153,7 +153,7 @@ class Reconocimientos(models.Model):
             raise ValidationError("Error: El reconocimiento no puede tener una fecha futura.")
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'reconocimientos'
 
 # ======================================================
@@ -177,7 +177,7 @@ class CursosRealizados(models.Model):
             raise ValidationError("Error: El total de horas no puede ser negativo.")
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'cursosrealizados'
 
 # ======================================================
@@ -197,7 +197,7 @@ class ProductosAcademicos(models.Model):
             raise ValidationError("Error: La fecha del producto académico no puede ser futura.")
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'productosacademicos'
 
 # ======================================================
@@ -218,5 +218,5 @@ class VentaGarage(models.Model):
             raise ValidationError("Error: El valor del bien no puede ser negativo.")
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'ventagarage'
