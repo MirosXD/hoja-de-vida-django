@@ -22,7 +22,6 @@
         }
         .profile-table { width: 100%; }
         
-        /* Contenedor fijo para la foto de perfil */
         .photo-frame {
             width: 100px;
             height: 100px;
@@ -32,7 +31,7 @@
             text-align: center;
         }
         .profile-photo {
-            width: 100%; /* Se adapta al ancho del círculo */
+            width: 100%;
             height: auto;
             display: block;
         }
@@ -78,20 +77,22 @@
             vertical-align: top;
         }
 
-        /* Contenedor de miniaturas para productos y certificados */
-        .thumb-container {
-            width: 80px;
-            height: 80px;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            overflow: hidden;
-            text-align: center;
-            background-color: #f7fafc;
-        }
-        .thumb {
+        /* CONFIGURACIÓN DE TAMAÑOS DE IMAGEN SIN ACHATAR */
+        .page-break { page-break-before: always; }
+
+        .img-full-page {
             width: 100%;
-            height: auto;
+            /* No usamos height fijo para evitar que se achate */
+            max-height: 750px; 
             display: block;
+            margin: 0 auto;
+        }
+
+        .img-half-page {
+            width: 100%;
+            max-height: 400px; 
+            display: block;
+            margin: 0 auto;
         }
 
         .description-text {
@@ -100,18 +101,20 @@
             text-align: justify;
         }
 
-        .page-break {
-            page-break-before: always;
-        }
-
         .price-tag {
             color: #059669;
             font-weight: bold;
             font-size: 10pt;
-            margin-top: 5px;
+            margin: 5px 0;
             background: #ecfdf5;
             padding: 2px 6px;
             border-radius: 4px;
+            display: inline-block;
+        }
+
+        .full-anexo-container {
+            margin-bottom: 10px;
+            text-align: center;
         }
     </style>
 </head>
@@ -182,97 +185,64 @@
         {% for curso in cursos %}
         <tr>
             <td style="width: 25%;">{{ curso.fechafin }}</td>
-            <td>
-                <strong>{{ curso.nombrecurso }}</strong> ({{ curso.totalhoras }} hrs)
-            </td>
+            <td><strong>{{ curso.nombrecurso }}</strong> ({{ curso.totalhoras }} hrs)</td>
         </tr>
         {% endfor %}
     </table>
 
-    {% if productos_laborales or productos_academicos %}
-    <div class="section-title">Portafolio y Productos Vinculados</div>
-    <table class="content-table">
-        {% for p in productos_laborales %}
-        <tr>
-            <td style="width: 90px;">
-                <div class="thumb-container">
-                    {% if p.sas_url %}<img src="{{ p.sas_url }}" class="thumb">{% endif %}
-                </div>
-            </td>
-            <td>
-                <strong>{{ p.nombreproducto }}</strong> (Laboral)
-                <div class="description-text">{{ p.descripcion|truncatechars:200 }}</div>
-            </td>
-        </tr>
-        {% endfor %}
-        {% for a in productos_academicos %}
-        <tr>
-            <td style="width: 90px;">
-                <div class="thumb-container">
-                    {% if a.sas_url %}<img src="{{ a.sas_url }}" class="thumb">{% endif %}
-                </div>
-            </td>
-            <td>
-                <strong>{{ a.nombreproducto }}</strong> (Académico)
-                <div class="description-text">{{ a.descripcion|truncatechars:200 }}</div>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+    {% if productos_laborales %}
+    {% for p in productos_laborales %}
+    <div class="page-break"></div>
+    <div class="section-title">Producto Laboral: {{ p.nombreproducto }}</div>
+    <div class="full-anexo-container">
+        <div class="description-text" style="margin-bottom: 5px;">{{ p.descripcion }}</div>
+        {% if p.sas_url %}
+            <img src="{{ p.sas_url }}" class="img-full-page">
+        {% endif %}
+    </div>
+    {% endfor %}
     {% endif %}
 
+    {% if productos_academicos %}
+    {% for a in productos_academicos %}
     <div class="page-break"></div>
-
-    <div class="section-title">Catálogo de Venta de Garage</div>
-    <p style="font-size: 8pt; color: #718096; margin-bottom: 10px;">Artículos publicados por el usuario vinculados a este perfil.</p>
-    
-    <table class="content-table">
-        {% for item in venta_garage %}
-        <tr>
-            <td style="width: 90px;">
-                <div class="thumb-container">
-                    {% if item.sas_url %}
-                        <img src="{{ item.sas_url }}" class="thumb">
-                    {% endif %}
-                </div>
-            </td>
-            <td>
-                <strong style="font-size: 10pt; color: #2d3748;">{{ item.nombreproducto }}</strong>
-                <div class="description-text">{{ item.descripcion }}</div>
-                <div style="margin-top: 5px;">
-                    <span class="price-tag">Precio: ${{ item.precio_display }}</span>
-                </div>
-            </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="2" style="text-align: center; color: #a0aec0; padding: 20px;">
-                No hay productos en venta vinculados actualmente.
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+    <div class="section-title">Producto Académico: {{ a.nombreproducto }}</div>
+    <div class="full-anexo-container">
+        <div class="description-text" style="margin-bottom: 5px;">{{ a.descripcion }}</div>
+        {% if a.sas_url %}
+            <img src="{{ a.sas_url }}" class="img-full-page">
+        {% endif %}
+    </div>
+    {% endfor %}
+    {% endif %}
 
     {% if reconocimientos %}
-    <div class="section-title">Reconocimientos y Certificados</div>
-    <table class="content-table">
-        {% for r in reconocimientos %}
-        <tr>
-            <td style="width: 90px;">
-                <div class="thumb-container">
-                    {% if r.sas_url %}
-                        <img src="{{ r.sas_url }}" class="thumb">
-                    {% endif %}
-                </div>
-            </td>
-            <td>
-                <strong style="color: #2d3748;">{{ r.tiporeconocimiento }}</strong>
-                <p style="margin: 2px 0; color: #4a5568;">{{ r.institucioncertificado }}</p>
-                <p style="margin: 0; font-size: 8pt; color: #718096;">Fecha: {{ r.fechareconocimiento }}</p>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+    {% for r in reconocimientos %}
+    <div class="page-break"></div>
+    <div class="section-title">Reconocimiento: {{ r.tiporeconocimiento }}</div>
+    <div class="full-anexo-container">
+        <p><strong>Institución:</strong> {{ r.institucioncertificado }} | <strong>Fecha:</strong> {{ r.fechareconocimiento }}</p>
+        {% if r.sas_url %}
+            <img src="{{ r.sas_url }}" class="img-full-page">
+        {% endif %}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    {% if venta_garage %}
+    <div class="page-break"></div>
+    <div class="section-title">Catálogo de Venta de Garage</div>
+    {% for item in venta_garage %}
+        <div style="margin-bottom: 20px; border-bottom: 1px dashed #cbd5e0; padding-bottom: 10px;">
+            <h3 style="margin: 0;">{{ item.nombreproducto }}</h3>
+            <p class="description-text" style="margin: 5px 0;">{{ item.descripcion }}</p>
+            <div class="price-tag">Precio: ${{ item.precio_display }}</div>
+            {% if item.sas_url %}
+                <img src="{{ item.sas_url }}" class="img-half-page">
+            {% endif %}
+        </div>
+        {% if not forloop.last and forloop.counter|divisibleby:2 %} <div class="page-break"></div> {% endif %}
+    {% endfor %}
     {% endif %}
 
 </body>

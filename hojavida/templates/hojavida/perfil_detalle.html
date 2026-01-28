@@ -50,10 +50,30 @@
       background:rgba(255,255,255,.04);
       font-size: 14px;
       transition: 0.3s;
+      cursor: pointer;
     }
     .back:hover { background:rgba(255,255,255,.1); }
 
-    /* Botón Venta de Garage */
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      padding: 6px 12px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 8px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 500;
+      transition: 0.3s;
+    }
+    .btn-download:hover {
+      background: var(--accent);
+      color: white;
+      text-decoration: none;
+    }
+
     .btn-garage {
       background: rgba(16, 185, 129, 0.15) !important;
       border-color: rgba(16, 185, 129, 0.4) !important;
@@ -95,7 +115,6 @@
       box-shadow: var(--shadow);
     }
 
-    /* CONTENEDOR FLEX PARA FOTO + INFO */
     .hero-content {
       display: flex;
       gap: 25px;
@@ -116,7 +135,6 @@
     .name{ margin:0; font-size:32px; line-height:1.1; letter-spacing: -1px; }
     .subtitle{ margin:8px 0 15px; color:var(--muted); font-size:15px; line-height: 1.4; }
 
-    /* GRID DE DATOS PERSONALES A LA DERECHA */
     .personal-data {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -163,9 +181,10 @@
     .hint{color:var(--muted); font-size:13px}
 
     .timeline{ border-left:1px solid var(--line); padding-left:14px; }
-    .item{ position:relative; padding:10px 0; }
+    .item{ position:relative; padding:15px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+    .item:last-child { border-bottom: none; }
     .item:before{
-      content:""; position:absolute; left:-21px; top:16px;
+      content:""; position:absolute; left:-21px; top:20px;
       width:12px; height:12px; border-radius:50%;
       background: var(--accent);
     }
@@ -183,8 +202,14 @@
       border: 1px solid var(--line);
       border-radius: 12px;
       overflow: hidden;
+      transition: 0.3s;
     }
-    .product-item img { width: 100%; height: 100px; object-fit: cover; }
+    .product-item:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+    }
+    .product-item a { display: block; text-decoration: none; color: inherit; }
+    .product-item img { width: 100%; height: 100px; object-fit: cover; display: block; }
     .product-info { padding: 8px; font-size: 12px; }
 
     .empty{ padding:12px; border:1px dashed var(--line); border-radius:12px; color:var(--muted); font-size:14px; }
@@ -289,6 +314,11 @@
               <p class="title">{{ e.cargodesempenado }}</p>
               <p class="meta"><strong>{{ e.nombrempresa }}</strong> | {{ e.fechainiciogestion }} → {{ e.fechafingestion|default:"Actualidad" }}</p>
               <p class="desc" style="font-size:13px; margin-top:5px; color:var(--text); opacity:0.8;">{{ e.descripcionfunciones }}</p>
+              {% if e.sas_url %}
+                <a href="{{ e.sas_url }}" target="_blank" class="btn-download">
+                  📂 Descargar información adjuntada
+                </a>
+              {% endif %}
             </div>
           {% endfor %}
         </div>
@@ -305,6 +335,11 @@
             <div class="item">
               <p class="title">{{ c.nombrecurso }}</p>
               <p class="meta">{{ c.totalhoras }} horas acumuladas | Finalizado: {{ c.fechafin }}</p>
+              {% if c.sas_url %}
+                <a href="{{ c.sas_url }}" target="_blank" class="btn-download">
+                  📜 Ver certificado adjunto
+                </a>
+              {% endif %}
             </div>
           {% endfor %}
         </div>
@@ -321,6 +356,11 @@
             <div class="item">
               <p class="title">{{ r.tiporeconocimiento }}</p>
               <p class="meta"><i>{{ r.institucioncertificado }}</i> ({{ r.fechareconocimiento }})</p>
+              {% if r.sas_url %}
+                <a href="{{ r.sas_url }}" target="_blank" class="btn-download">
+                  🏆 Descargar información adjuntada
+                </a>
+              {% endif %}
             </div>
           {% endfor %}
         </div>
@@ -335,14 +375,26 @@
             <div class="product-grid">
                 {% for p in productos_laborales %}
                     <div class="product-item">
-                        {% if p.foto_producto %}<img src="{{ p.foto_producto.url }}">{% endif %}
-                        <div class="product-info"><strong>{{ p.nombreproducto }}</strong><br><span class="meta" style="color:var(--accent)">Laboral</span></div>
+                        {% if p.sas_url %}
+                          <a href="{{ p.sas_url }}" target="_blank" title="Ver en grande">
+                            <img src="{{ p.sas_url }}">
+                            <div class="product-info"><strong>{{ p.nombreproducto }}</strong><br><span class="meta" style="color:var(--accent)">Laboral</span></div>
+                          </a>
+                        {% else %}
+                          <div class="product-info"><strong>{{ p.nombreproducto }}</strong><br><span class="meta" style="color:var(--accent)">Laboral</span></div>
+                        {% endif %}
                     </div>
                 {% endfor %}
                 {% for a in productos_academicos %}
                     <div class="product-item">
-                        {% if a.foto_producto %}<img src="{{ a.foto_producto.url }}">{% endif %}
-                        <div class="product-info"><strong>{{ a.nombreproducto }}</strong><br><span class="meta" style="color:var(--muted)">Académico</span></div>
+                        {% if a.sas_url %}
+                          <a href="{{ a.sas_url }}" target="_blank" title="Ver en grande">
+                            <img src="{{ a.sas_url }}">
+                            <div class="product-info"><strong>{{ a.nombreproducto }}</strong><br><span class="meta" style="color:var(--muted)">Académico</span></div>
+                          </a>
+                        {% else %}
+                          <div class="product-info"><strong>{{ a.nombreproducto }}</strong><br><span class="meta" style="color:var(--muted)">Académico</span></div>
+                        {% endif %}
                     </div>
                 {% endfor %}
             </div>
